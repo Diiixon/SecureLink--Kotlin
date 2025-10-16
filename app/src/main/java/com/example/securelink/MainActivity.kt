@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
                     val stats by homeViewModel.stats.collectAsStateWithLifecycle()
                     val learnItems by homeViewModel.learnItems.collectAsStateWithLifecycle()
 
-                    HomeScreen(stats = stats, learnItems = learnItems)
+                    HomeScreen(stats = stats)
                 }
             }
         }

@@ -35,8 +35,8 @@ fun StatsCard(stat: StatItem, modifier: Modifier = Modifier) {
 @Composable
 fun StatsSection(stats: List<StatItem>) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = "El Pulso de la Seguridad Digital", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.White, modifier = Modifier.padding(top = 40.dp, bottom = 16.dp))
-        Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(text = "El Pulso de la Seguridad Digital", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.White, modifier = Modifier.padding(top = 80.dp, bottom = 50.dp))
+        Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(67.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             stats.forEach { stat ->
                 StatsCard(stat = stat)
             }
@@ -45,12 +45,12 @@ fun StatsSection(stats: List<StatItem>) {
 }
 
 @Composable
-fun HomeScreen(stats: List<StatItem>, learnItems: List<LearnItem>) {
+fun HomeScreen(stats: List<StatItem>) {
     // Column ahora necesita ser scrollable para que quepa todo el contenido
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp)
+            .padding(horizontal = 27.dp)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -64,62 +64,9 @@ fun HomeScreen(stats: List<StatItem>, learnItems: List<LearnItem>) {
 
         StatsSection(stats = stats)
 
-        LearnSection(learnItems = learnItems)
+
 
         Spacer(modifier = Modifier.height(32.dp))
     }
 }
 
-@Composable
-fun LearnCard(item: LearnItem, modifier: Modifier = Modifier){
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(color = Color(0xFF005F73), shape = RoundedCornerShape(16.dp))
-            .padding(16.dp)
-    ) {
-        Image(
-            painter = painterResource(id = item.imageResId),
-            contentDescription = item.title,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(150.dp)
-                .clip(RoundedCornerShape(12.dp)),
-            contentScale = ContentScale.Crop
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = item.title,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = item.description,
-            fontSize = 14.sp,
-            color = Color(0xFF94D2BD)
-        )
-    }
-}
-
-@Composable
-fun LearnSection(learnItems: List<LearnItem>) {
-    Column(
-        modifier = Modifier.padding(top = 40.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Conviértete en un Experto",
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            learnItems.forEach { item ->
-                LearnCard(item = item)
-            }
-        }
-    }
-}
