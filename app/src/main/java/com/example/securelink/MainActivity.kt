@@ -18,12 +18,18 @@ import com.example.securelink.view.AnalyzerScreen
 import com.example.securelink.view.HomeScreen
 import com.example.securelink.viewmodel.HomeViewModel
 import com.example.securelink.viewmodel.AnalyzerViewModel
+import com.example.securelink.view.EstadisticasScreen
+import com.example.securelink.viewmodel.EstadisticasViewModel
+
 
 class MainActivity : ComponentActivity() {
 
     // 1. Crea las instancias de tus ViewModels
     private val homeViewModel: HomeViewModel by viewModels()
     private val analyzerViewModel: AnalyzerViewModel by viewModels()
+
+    private val estadisticasViewModel: EstadisticasViewModel by viewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,6 +67,12 @@ class MainActivity : ComponentActivity() {
                                 viewModel = analyzerViewModel
                             )
                         }
+
+                        composable("estadisticas") {
+                            EstadisticasScreen(navController = navController)
+                        }
+
+                        // Otras rutas...") {  }
 
                         // Aquí añadiremos más rutas en el futuro (login, registro, perfil, etc.)
                     }
