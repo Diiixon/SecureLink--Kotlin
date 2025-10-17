@@ -60,4 +60,5 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.1")
 // LiveData/StateFlow observation
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.1")
+    implementation("androidx.navigation:navigation-compose:2.9.5")
 }
