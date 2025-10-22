@@ -3,9 +3,9 @@ package com.example.securelink.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.securelink.model.LearnItem
-import com.example.securelink.model.LearnRepository
+import com.example.securelink.repository.LearnRepository
 import com.example.securelink.model.StatItem
-import com.example.securelink.model.StatsRepository
+import com.example.securelink.repository.StatsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

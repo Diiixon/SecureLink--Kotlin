@@ -62,7 +62,7 @@ fun HomeScreen(stats: List<StatItem>, navController: NavController) {
         Image(painter = painterResource(id = R.drawable.securelink_logo), contentDescription = "Logo", modifier = Modifier.size(120.dp).padding(bottom = 24.dp))
         Text(text = "Tu primera línea de defensa...", color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
         Text(text = "Analizamos enlaces...", color = Color(0xFF94D2BD), fontSize = 16.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 16.dp))
-        Button(onClick = { navController.navigate("Registro") }, modifier = Modifier.fillMaxWidth().padding(top = 24.dp), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEE9B00))) {
+        Button(onClick = { navController.navigate("RegistroScreen") }, modifier = Modifier.fillMaxWidth().padding(top = 24.dp), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEE9B00))) {
             Text(text = "Crea tu Cuenta Gratis", color = Color.Black)
         }
         Button(onClick = { navController.navigate("Login") }, modifier = Modifier.fillMaxWidth().padding(top = 24.dp), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEE9B00))) {

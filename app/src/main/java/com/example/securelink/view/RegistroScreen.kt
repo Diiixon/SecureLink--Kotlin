@@ -1,7 +1,6 @@
 package com.example.securelink.view
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,18 +13,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+// --- 1. YA NO SE NECESITA LaunchedEffect ---
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -39,23 +37,27 @@ import com.example.securelink.ui.theme.Mint
 import com.example.securelink.ui.theme.Red
 import com.example.securelink.ui.theme.Teal
 import com.example.securelink.ui.theme.White
-import com.example.securelink.viewmodel.UsuarioViewModel
-
+// --- 2. IMPORTAR EL VIEWMODEL CORRECTO ---
+import com.example.securelink.viewmodel.RegistroViewModel
 
 
 @Composable
 fun Formulario(
     navController: NavController,
-    viewModel: UsuarioViewModel
+    // --- 3. CAMBIAR EL TIPO DE VIEWMODEL ---
+    viewModel: RegistroViewModel
 ) {
     val estado by viewModel.estado.collectAsState()
 
-    // Contenedor principal que simula el `body` con el color de fondo
+    // --- 4. ELIMINAMOS EL LaunchedEffect ---
+    // Era conflictivo con la navegación del botón.
+    // Dejamos que el botón se encargue de navegar.
+
+    // Contenedor principal
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = DarkBlue
     ) {
-        // Centra la tarjeta del formulario en la pantalla, como `auth-container`
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -69,11 +71,10 @@ fun Formulario(
                     .shadow(elevation = 10.dp, shape = RoundedCornerShape(16.dp))
                     .background(DarkTeal, shape = RoundedCornerShape(16.dp))
                     .padding(horizontal = 24.dp, vertical = 40.dp)
-                    .verticalScroll(rememberScrollState()), // Permite scroll si el contenido es muy largo
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                // Encabezado del formulario,
                 Text(
                     text = "Crear una Cuenta",
                     color = White,
@@ -83,13 +84,12 @@ fun Formulario(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Únete a nosotros para empezar.",
+                    text = "Únete para proteger tu navegación",
                     color = Mint,
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // Estilos personalizados para los campos de texto, como `input-group`
                 val textFieldColors = TextFieldDefaults.colors(
                     focusedContainerColor = White,
                     unfocusedContainerColor = White,
@@ -103,9 +103,9 @@ fun Formulario(
                     unfocusedLabelColor = DarkTeal
                 )
 
-                // Campos de texto con los estilos aplicados
+                // --- 5. CAMBIAR NOMBRES DE ESTADO (camelCase) ---
                 OutlinedTextField(
-                    value = estado.NombreUsuario,
+                    value = estado.nombreUsuario, // <-- CAMBIO
                     onValueChange = viewModel::onNombreUsuarioChange,
                     label = { Text("Nombre Usuario") },
                     isError = estado.errores.NombreUsuario != null,
@@ -121,7 +121,7 @@ fun Formulario(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 OutlinedTextField(
-                    value = estado.CorreoElectronico,
+                    value = estado.correoElectronico, // <-- CAMBIO
                     onValueChange = viewModel::onCorreoElectronicoChange,
                     label = { Text("Correo Electrónico") },
                     isError = estado.errores.CorreoElectronico != null,
@@ -137,7 +137,7 @@ fun Formulario(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 OutlinedTextField(
-                    value = estado.Contrasena,
+                    value = estado.contrasena, // <-- CAMBIO
                     onValueChange = viewModel::onContrasenaChange,
                     label = { Text("Contraseña") },
                     visualTransformation = PasswordVisualTransformation(),
@@ -154,7 +154,7 @@ fun Formulario(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 OutlinedTextField(
-                    value = estado.ContrasenaConfirmada,
+                    value = estado.contrasenaConfirmada, // <-- CAMBIO
                     onValueChange = viewModel::onContrasenaConfirmadaChange,
                     label = { Text("Confirmar Contraseña") },
                     visualTransformation = PasswordVisualTransformation(),
@@ -171,12 +171,15 @@ fun Formulario(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Botones con estilo personalizado, como `submit-btn`
+                // La lógica del botón ya era correcta.
                 Button(
                     onClick = {
-                        if (viewModel.validarFormulario()) {
-                            navController.navigate("resumen")
-                        }
+                        viewModel.registrarUsuario(
+                            onRegistroExitoso = {
+                                // Navega a Login cuando el VM confirma el éxito
+                                navController.navigate("Login")
+                            }
+                        )
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -201,7 +204,7 @@ fun Formulario(
                         .height(50.dp),
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Teal, // Un color secundario para diferenciarlo
+                        containerColor = Teal,
                         contentColor = White
                     )
                 ) {
