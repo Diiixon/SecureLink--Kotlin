@@ -17,8 +17,8 @@ import androidx.compose.ui.unit.sp
 import com.example.securelink.R
 import androidx.compose.foundation.verticalScroll
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import com.example.securelink.model.LearnItem
+
 
 @Composable
 fun StatsCard(stat: StatItem, modifier: Modifier = Modifier) {
@@ -32,7 +32,7 @@ fun StatsCard(stat: StatItem, modifier: Modifier = Modifier) {
 fun StatsSection(stats: List<StatItem>) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(text = "El Pulso de la Seguridad Digital", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.White, modifier = Modifier.padding(top = 80.dp, bottom = 50.dp))
-        Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(67.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             stats.forEach { stat ->
                 StatsCard(stat = stat)
             }
@@ -41,8 +41,8 @@ fun StatsSection(stats: List<StatItem>) {
 }
 
 @Composable
-fun HomeScreen(navController: NavController, stats: List<StatItem>, learnItems: List<LearnItem>) {
-    // Column ahora necesita ser scrollable para que quepa todo el contenido
+fun HomeScreen(stats: List<StatItem>, navController: NavController, learnItems: List<LearnItem>) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -51,32 +51,63 @@ fun HomeScreen(navController: NavController, stats: List<StatItem>, learnItems: 
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(32.dp))
-        Image(painter = painterResource(id = R.drawable.securelink_logo), contentDescription = "Logo", modifier = Modifier.size(120.dp).padding(bottom = 24.dp))
-        Text(text = "Tu primera línea de defensa...", color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-        Text(text = "Analizamos enlaces...", color = Color(0xFF94D2BD), fontSize = 16.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 16.dp))
+        Image(
+            painter = painterResource(id = R.drawable.securelink_logo),
+            contentDescription = "Logo",
+            modifier = Modifier.size(120.dp).padding(bottom = 24.dp)
+        )
+        Text(
+            text = "Tu primera línea de defensa...",
+            color = Color.White,
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center
+        )
+        Text(
+            text = "Analizamos enlaces...",
+            color = Color(0xFF94D2BD),
+            fontSize = 16.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = 16.dp)
+        )
         Button(
             onClick = { /*TODO*/ }, modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEE9B00))) {
-            Text(text = "Crea tu Cuenta Gratis", color = Color.Black)
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(text = "o", color = Color.White)
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = { navController.navigate("analyzer") },
-            modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEE9B00))
-        ) { Text(
-            text = "Inicia Sesión", color = Color.Black
-        ) }
+        ) {
+            Button(
+                onClick = { navController.navigate("RegistroScreen") },
+                modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEE9B00))
+            ) {
+                Text(text = "Crea tu Cuenta Gratis", color = Color.Black)
+            }
+            Button(
+                onClick = { navController.navigate("Login") },
+                modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEE9B00))
+            ) {
+                Text(text = "Inicia sesion", color = Color.Black);
+            }
 
-        StatsSection(stats = stats)
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(text = "o", color = Color.White)
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = { navController.navigate("analyzer") },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEE9B00))
+            ) {
+                Text(
+                    text = "Inicia Sesión", color = Color.Black
+                )
+            }
+
+            StatsSection(stats = stats)
 
         Spacer(modifier = Modifier.height(32.dp))
     }
 }
-
+}
