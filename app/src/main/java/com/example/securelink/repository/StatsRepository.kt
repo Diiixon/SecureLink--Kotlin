@@ -1,4 +1,6 @@
-package com.example.securelink.model
+package com.example.securelink.repository
+
+import com.example.securelink.model.StatItem
 
 class StatsRepository {
     fun getStats(): List<StatItem>{

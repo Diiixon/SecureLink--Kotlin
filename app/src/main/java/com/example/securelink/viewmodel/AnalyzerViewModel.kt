@@ -47,4 +47,13 @@ class AnalyzerViewModel : ViewModel() {
             // TODO: Aquí irá la lógica para actualizar las estadísticas del usuario
         }
     }
+
+    fun resetAnalysis() {
+        _uiState.update {
+            it.copy(
+                isLoading = false,
+                analysisResult = null
+            )
+        }
+    }
 }
