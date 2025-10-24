@@ -5,6 +5,8 @@ import com.example.securelink.model.Data.SessionManager
 import com.example.securelink.model.Data.Usuario
 import com.example.securelink.model.Data.UsuarioDao
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
 
@@ -23,6 +25,17 @@ class AuthRepository(
      * Devuelve el Usuario si tiene éxito o null si el correo ya existe.
      * Lanza una excepción si hay un error de BD.
      */
+
+    val usuarioActual: Flow<Usuario?> = sessionManager.idUsuarioFlow.flatMapLatest { id ->
+        if (id == null) {
+            kotlinx.coroutines.flow.flowOf(null)
+        } else {
+            kotlinx.coroutines.flow.flow {
+                emit(usuarioDao.getUsuarioPorId(id))
+            }
+        }
+    }
+
     suspend fun registrarUsuario(
         nombre: String,
         correo: String,
@@ -79,6 +92,13 @@ class AuthRepository(
             sessionManager.guardarIdUsuario(usuario.id)
             Log.d("AuthRepository", "Login exitoso.")
             return@withContext usuario
+        }
+    }
+
+    suspend fun cerrarSesion() {
+        withContext(Dispatchers.IO) {
+            sessionManager.guardarIdUsuario(-1)
+            Log.d("AuthRepository", "Sesión cerrada.")
         }
     }
 

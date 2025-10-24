@@ -39,14 +39,11 @@ import com.example.securelink.ui.theme.Mint
 import com.example.securelink.ui.theme.Red
 import com.example.securelink.ui.theme.Teal
 import com.example.securelink.ui.theme.White
-
-// --- 1. IMPORTAR EL VIEWMODEL CORRECTO ---
 import com.example.securelink.viewmodel.LoginViewModel
 
 @Composable
 fun LoginScreen(
     navController: NavController,
-    // --- 2. CAMBIAR EL TIPO DE VIEWMODEL ---
     viewModel: LoginViewModel
 ) {
     val estado by viewModel.estado.collectAsState()
@@ -99,17 +96,15 @@ fun LoginScreen(
                 )
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // --- 3. CAMBIAR ESTADO, HANDLER Y ERRORES ---
                 OutlinedTextField(
-                    value = estado.correoElectronico, // <-- CAMBIO
-                    onValueChange = viewModel::onCorreoChange, // <-- CAMBIO
+                    value = estado.correoElectronico,
+                    onValueChange = viewModel::onCorreoChange,
                     label = { Text("Correo Electrónico") },
                     modifier = Modifier.fillMaxWidth(),
                     colors = textFieldColors,
                     shape = RoundedCornerShape(8.dp),
-                    isError = estado.error != null, // <-- CAMBIO
+                    isError = estado.error != null,
                     supportingText = {
-                        // Usamos el error general
                         estado.error?.let {
                             Text(it, color = Red)
                         }
@@ -117,18 +112,16 @@ fun LoginScreen(
                 )
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // --- 4. CAMBIAR ESTADO, HANDLER Y ERRORES ---
                 OutlinedTextField(
-                    value = estado.contrasena, // <-- CAMBIO
-                    onValueChange = viewModel::onContrasenaChange, // <-- CAMBIO
+                    value = estado.contrasena,
+                    onValueChange = viewModel::onContrasenaChange,
                     label = { Text("Contraseña") },
                     visualTransformation = PasswordVisualTransformation(),
                     modifier = Modifier.fillMaxWidth(),
                     colors = textFieldColors,
                     shape = RoundedCornerShape(8.dp),
-                    isError = estado.error != null, // <-- CAMBIO
+                    isError = estado.error != null,
                     supportingText = {
-                        // El error se muestra arriba, aquí no es necesario
                     }
                 )
 
@@ -146,15 +139,17 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(54.dp))
 
-                // Lógica del botón ya es correcta
                 Button(
                     onClick = {
                         viewModel.iniciarSesion(
                             onLoginExitoso = {
-                                navController.navigate("PerfilScreen") {
-                                    popUpTo(navController.graph.startDestinationId) {
+                                // Navega a la pantalla principal que contiene el menú.
+                                navController.navigate("MainApp") {
+                                    // Borra todo el historial de autenticación
+                                    popUpTo("home") {
                                         inclusive = true
                                     }
+                                    launchSingleTop = true
                                 }
                             }
                         )
@@ -188,3 +183,4 @@ fun LoginScreen(
         }
     }
 }
+

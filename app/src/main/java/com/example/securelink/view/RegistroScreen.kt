@@ -197,7 +197,7 @@ fun Formulario(
 
                 Button(
                     onClick = {
-                        navController.navigate("HomeScreen")
+                        navController.popBackStack()
                     },
                     modifier = Modifier
                         .fillMaxWidth()

@@ -18,12 +18,13 @@ import com.example.securelink.R
 import androidx.compose.foundation.verticalScroll
 import androidx.navigation.NavController
 import com.example.securelink.model.LearnItem
+import com.example.securelink.ui.theme.Gold
 
 
 @Composable
 fun StatsCard(stat: StatItem, modifier: Modifier = Modifier) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = stat.count, fontSize = 32.sp, fontWeight = FontWeight.Bold, color = Color(0xFFEE9B00))
+        Text(text = stat.count, fontSize = 32.sp, fontWeight = FontWeight.Bold, color = Gold)
         Text(text = stat.description, fontSize = 14.sp, color = Color(0xFF94D2BD), textAlign = TextAlign.Center)
     }
 }
@@ -70,44 +71,33 @@ fun HomeScreen(stats: List<StatItem>, navController: NavController, learnItems: 
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(top = 16.dp)
         )
+
+        // Botón para Registrarse
         Button(
-            onClick = { /*TODO*/ }, modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEE9B00))
+            onClick = { navController.navigate("RegistroScreen") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 24.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Gold)
         ) {
-            Button(
-                onClick = { navController.navigate("RegistroScreen") },
-                modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEE9B00))
-            ) {
-                Text(text = "Crea tu Cuenta Gratis", color = Color.Black)
-            }
-            Button(
-                onClick = { navController.navigate("Login") },
-                modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEE9B00))
-            ) {
-                Text(text = "Inicia sesion", color = Color.Black);
-            }
+            Text(text = "Crea tu Cuenta Gratis", color = Color.Black)
+        }
 
-            Spacer(modifier = Modifier.height(16.dp))
+        // Botón para Iniciar Sesión
+        Button(
+            onClick = { navController.navigate("Login") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Gold)
+        ) {
+            Text(text = "Inicia sesion", color = Color.Black);
+        }
 
-            Text(text = "o", color = Color.White)
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = { navController.navigate("analyzer") },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEE9B00))
-            ) {
-                Text(
-                    text = "Inicia Sesión", color = Color.Black
-                )
-            }
-
-            StatsSection(stats = stats)
+        // Sección de Estadísticas
+        StatsSection(stats = stats)
 
         Spacer(modifier = Modifier.height(32.dp))
     }
 }
-}
+
