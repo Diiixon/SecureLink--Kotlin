@@ -1,8 +1,9 @@
 package com.example.securelink.model
 
+// CORREGIDO: Propiedades en camelCase para seguir la convención de Kotlin.
 data class UsuarioErrores(
-    val NombreUsuario: String? = null,
-    val CorreoElectronico: String? = null,
-    val Contrasena: String? = null,
-    val ContrasenaConfirmada: String? = null
+    val nombreUsuario: String? = null,
+    val correoElectronico: String? = null,
+    val contrasena: String? = null,
+    val contrasenaConfirmada: String? = null
 )

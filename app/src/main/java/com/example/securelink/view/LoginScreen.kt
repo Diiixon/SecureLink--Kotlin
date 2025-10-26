@@ -41,13 +41,16 @@ import com.example.securelink.ui.theme.Teal
 import com.example.securelink.ui.theme.White
 import com.example.securelink.viewmodel.LoginViewModel
 
+// Composable principal para la pantalla de inicio de sesión.
 @Composable
 fun LoginScreen(
     navController: NavController,
     viewModel: LoginViewModel
 ) {
+    // Obtiene el estado de la UI desde el ViewModel y reacciona a sus cambios.
     val estado by viewModel.estado.collectAsState()
 
+    // Define un estilo reutilizable para los campos de texto, para mantener la consistencia.
     val textFieldColors = TextFieldDefaults.colors(
         focusedContainerColor = White,
         unfocusedContainerColor = White,
@@ -71,6 +74,7 @@ fun LoginScreen(
                 .padding(16.dp),
             contentAlignment = Alignment.Center
         ) {
+            // Contenedor principal del formulario.
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -96,6 +100,7 @@ fun LoginScreen(
                 )
                 Spacer(modifier = Modifier.height(32.dp))
 
+                // Campo para el correo. Muestra un error si el estado lo indica.
                 OutlinedTextField(
                     value = estado.correoElectronico,
                     onValueChange = viewModel::onCorreoChange,
@@ -112,6 +117,7 @@ fun LoginScreen(
                 )
                 Spacer(modifier = Modifier.height(24.dp))
 
+                // Campo para la contraseña. Usa PasswordVisualTransformation para ocultar el texto.
                 OutlinedTextField(
                     value = estado.contrasena,
                     onValueChange = viewModel::onContrasenaChange,
@@ -121,10 +127,10 @@ fun LoginScreen(
                     colors = textFieldColors,
                     shape = RoundedCornerShape(8.dp),
                     isError = estado.error != null,
-                    supportingText = {
-                    }
+                    supportingText = {}
                 )
 
+                // Texto clicable que navega a la pantalla de recuperación de contraseña.
                 ClickableText(
                     text = AnnotatedString("¿Olvidaste tu contraseña?"),
                     style = TextStyle(
@@ -139,16 +145,15 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(54.dp))
 
+                // Botón principal que inicia el proceso de login en el ViewModel.
                 Button(
                     onClick = {
                         viewModel.iniciarSesion(
+                            // Callback que se ejecuta solo si el login en el ViewModel es exitoso.
                             onLoginExitoso = {
-                                // Navega a la pantalla principal que contiene el menú.
                                 navController.navigate("MainApp") {
-                                    // Borra todo el historial de autenticación
-                                    popUpTo("home") {
-                                        inclusive = true
-                                    }
+                                    // Limpia el stack de navegación hasta 'home' para que el usuario no pueda volver atrás.
+                                    popUpTo("home") { inclusive = true }
                                     launchSingleTop = true
                                 }
                             }
@@ -168,6 +173,7 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
+                // Texto clicable que navega a la pantalla de registro.
                 ClickableText(
                     text = AnnotatedString("¿No tienes una cuenta? Regístrate aqui"),
                     style = TextStyle(
@@ -183,4 +189,3 @@ fun LoginScreen(
         }
     }
 }
-

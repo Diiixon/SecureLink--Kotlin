@@ -4,29 +4,29 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverters // <-- Importar
+import androidx.room.TypeConverters
 
-@Database(entities = [Usuario::class], version = 2) // <-- CAMBIAR A version = 2
-@TypeConverters(DateConverter::class) // <-- Añadir esto
+// Aquí se define la base de datos.
+@Database(entities = [Usuario::class], version = 2)
+@TypeConverters(DateConverter::class)
 abstract class AppDatabase : RoomDatabase() {
 
+    // Función para acceder a las operaciones de la base de datos (las queries del DAO).
     abstract fun usuarioDao(): UsuarioDao
 
+    // 'companion object' para que solo haya una instancia de la base de datos
     companion object {
-        // 'Volatile' asegura que el valor de INSTANCE esté siempre actualizado
+
         @Volatile
         private var Instancia: AppDatabase? = null
 
         fun getDatabase(context: Context): AppDatabase {
-            // Retorna la instancia si ya existe
-            // Si no, crea la base de datos en un bloque 'synchronized'
             return Instancia ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "securelink_database" // Nombre del archivo de la BD
+                    "securelink_database"
                 )
-                    // Añade esto para manejar la migración de v1 a v2 (borra datos antiguos)
                     .fallbackToDestructiveMigration()
                     .build()
                 Instancia = instance

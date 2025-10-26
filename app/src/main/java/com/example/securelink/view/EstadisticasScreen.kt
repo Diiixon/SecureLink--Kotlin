@@ -1,96 +1,73 @@
 package com.example.securelink.view
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.securelink.viewmodel.EstadisticasViewModel
+import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
+import com.patrykandpatrick.vico.core.entry.entryOf
 
+// Composable principal de la pantalla de Estadísticas.
 @Composable
-fun KpiCard(value: String, label: String, modifier: Modifier = Modifier){
-    Card(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF005F73))
-    ){
-        Column(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(text = value, fontSize = 32.sp, fontWeight = FontWeight.Bold, color = Color.White)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = label, textAlign = TextAlign.Center, color = Color(0xFF94D2BD))
-        }
+fun EstadisticasScreen(viewModel: EstadisticasViewModel = viewModel()) {
+    // Obtiene el estado de la UI desde el ViewModel y reacciona a sus cambios.
+    val uiState by viewModel.uiState.collectAsState()
+
+    // Crea el productor de datos para el gráfico de barras (Vico).
+    val barModelProducer = remember { ChartEntryModelProducer() }
+
+    // Este efecto se ejecuta cuando los datos de la comparativa cambian.
+    // Prepara y actualiza los datos para el gráfico de barras.
+    LaunchedEffect(uiState.comparativaData) {
+        val userEntries = uiState.comparativaData.mapIndexed { index, data -> entryOf(index, data.userValue) }
+        val globalEntries = uiState.comparativaData.mapIndexed { index, data -> entryOf(index, data.globalValue) }
+        barModelProducer.setEntries(userEntries, globalEntries)
     }
-}
 
-@Composable
-fun EstadisticasScreen(navController: NavController){
     Column(
-        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(48.dp))
-
+        // --- Títulos de la pantalla ---
         Text(
             text = "Tu Panorama de Seguridad",
-            fontSize = 28.sp,
+            fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxSize()
+            color = Color.White
         )
-        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = "Datos actualizados en tiempo real",
-            textAlign = TextAlign.Center,
-            color = Color(0xFF94D2DB),
-            modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp)
+            fontSize = 14.sp,
+            color = Color.Gray
         )
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            KpiCard(value = "9", label = "Enlaces Analizados", modifier = Modifier.weight(1f))
-            KpiCard(value = "2", label = "Amenazas Bloqueadas", modifier = Modifier.weight(1f))
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            KpiCard(value = "Scam", label = "Amenaza Más Común", modifier = Modifier.weight(1f))
-            KpiCard(value = "33.3%", label = "Taza de Navegacion Segura", modifier = Modifier.weight(1f))
-        }
         Spacer(modifier = Modifier.height(32.dp))
 
-        Card(
-            modifier = Modifier.fillMaxWidth().height(250.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF005F73))
-        ) {
-            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()){
-                Text("Gráfico de Amenazas (proximamente)", color = Color.White)
-            }
-        }
+        // El gráfico de dona ahora usa Canvas y solo necesita la lista de "slices".
+        DonutChartCard(
+            slices = uiState.amenazasUsuario
+        )
+
         Spacer(modifier = Modifier.height(16.dp))
-        Card(
-            modifier = Modifier.fillMaxWidth().height(250.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF005F73))
-        ) {
-            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()){
-                Text("Comparativa Global (proximamente)", color = Color.White)
-            }
-        }
+
+        // El gráfico de barras sigue usando Vico y necesita su productor de datos.
+        BarChartCard(modelProducer = barModelProducer)
     }
 }

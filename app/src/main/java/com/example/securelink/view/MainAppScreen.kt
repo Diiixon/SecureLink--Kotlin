@@ -24,21 +24,26 @@ import com.example.securelink.viewmodel.LearnViewModel
 import com.example.securelink.viewmodel.PerfilViewModel
 import kotlinx.coroutines.launch
 
+// Composable principal que estructura la aplicación una vez que el usuario ha iniciado sesión.
+// Configura el menú lateral, la barra superior y el host de navegación interno.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainAppScreen(
     analyzerViewModel: AnalyzerViewModel,
-    mainNavController: NavController,
+    mainNavController: NavController, // El NavController principal, para la navegación global (ej: salir a 'home').
     mainViewModel: Any
 ){
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
+    // El NavController secundario, para la navegación entre las pantallas internas de la app.
     val internalNavController = rememberNavController()
 
+    // Componente raíz que gestiona el menú de navegación lateral.
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
+            // Define el contenido del menú lateral, pasándole ambos NavControllers.
             AppDrawerContent(
                 internalNavController = internalNavController,
                 mainNavController = mainNavController,
@@ -48,8 +53,10 @@ fun MainAppScreen(
         },
         gesturesEnabled = drawerState.isOpen
     ) {
+        // Estructura de layout estándar con una barra superior y el contenido principal.
         Scaffold(
             topBar = {
+                // Barra de navegación superior con el logo y el botón para abrir el menú.
                 TopAppBar(
                     title = { Text("")},
                     navigationIcon = {
@@ -61,11 +68,7 @@ fun MainAppScreen(
                         )
                     },
                     actions = {
-                        IconButton(onClick = {
-                            scope.launch {
-                                drawerState.open()
-                            }
-                        }) {
+                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
                             Icon(
                                 imageVector = Icons.Default.Menu,
                                 contentDescription = "Abrir Menú",
@@ -73,14 +76,14 @@ fun MainAppScreen(
                             )
                         }
                     },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = DarkBlue
-                    )
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkBlue)
                 )
             },
             containerColor = DarkBlue
         ) { paddingValues ->
             Box(modifier = Modifier.padding(paddingValues)) {
+                // NavHost interno que gestiona la navegación entre las secciones de la aplicación.
+                // Usa el 'internalNavController' para no interferir con la navegación principal.
                 NavHost(
                     navController = internalNavController,
                     startDestination = "analyzer_internal"
@@ -92,21 +95,17 @@ fun MainAppScreen(
                         )
                     }
                     composable("estadisticas_internal") {
-                        val statsViewModel: EstadisticasViewModel = viewModel()
-                        EstadisticasScreen(navController = internalNavController)
+                        EstadisticasScreen(viewModel = viewModel<EstadisticasViewModel>())
                     }
                     composable("learn_internal") {
-                        val learnViewModel: LearnViewModel = viewModel()
-                        LearnScreen(
-                            navController = internalNavController,
-                            viewModel = learnViewModel
-                        )
+                        LearnScreen(viewModel = viewModel<LearnViewModel>())
                     }
                     composable("perfil_internal") {
-                        val perfilViewModel: PerfilViewModel = viewModel()
+                        // A la pantalla de perfil se le pasa el NavController principal para que
+                        // pueda navegar a 'home' al eliminar o cerrar la sesión.
                         PerfilScreen(
-                            navController = internalNavController,
-                            viewModel = perfilViewModel
+                            navController = mainNavController, 
+                            viewModel = viewModel<PerfilViewModel>()
                         )
                     }
                 }

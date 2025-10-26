@@ -10,35 +10,29 @@ import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-// Extensión para crear el DataStore.
-// El nombre "sesion" será el nombre del archivo guardado en el teléfono.
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "sesion")
+// Crea una instancia de DataStore a nivel de aplicación para guardar las preferencias.
+// El archivo físico donde se guardarán los datos se llamará "sesion".
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "sesion")
 
+// Clase que gestiona la sesión del usuario (inicio y cierre) usando DataStore.
 class SessionManager(private val context: Context) {
 
     companion object {
-        // Creamos la "llave" (key) para guardar el ID del usuario
+        // Define la clave (key) para acceder al ID del usuario guardado en DataStore.
         val USER_ID_KEY = intPreferencesKey("user_id")
     }
 
-    /**
-     * Guarda el ID del usuario en DataStore.
-     * Esta es una función 'suspend' porque es asíncrona.
-     */
+    // Guarda un ID de usuario en DataStore para mantener la sesión activa.
     suspend fun guardarIdUsuario(id: Int) {
-        context.dataStore.edit { preferences ->
-            preferences[USER_ID_KEY] = id
+        context.dataStore.edit {
+            it[USER_ID_KEY] = id
         }
     }
 
-    /**
-     * Lee el ID del usuario desde DataStore.
-     * Devuelve un 'Flow', lo que permite a la UI "observar"
-     * cambios en la sesión en tiempo real.
-     */
+    // Expone el ID del usuario como un Flow para una observación reactiva.
+    // Emite el ID guardado o null si no hay ninguna sesión iniciada.
     val idUsuarioFlow: Flow<Int?> = context.dataStore.data
         .map { preferences ->
-            // Devuelve el ID guardado, o 'null' si no hay nada.
             preferences[USER_ID_KEY]
         }
 }

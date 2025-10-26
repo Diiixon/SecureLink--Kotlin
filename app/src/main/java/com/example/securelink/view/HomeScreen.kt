@@ -20,7 +20,7 @@ import androidx.navigation.NavController
 import com.example.securelink.model.LearnItem
 import com.example.securelink.ui.theme.Gold
 
-
+// Composable reutilizable para mostrar una estadística individual (número y descripción).
 @Composable
 fun StatsCard(stat: StatItem, modifier: Modifier = Modifier) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
@@ -29,10 +29,12 @@ fun StatsCard(stat: StatItem, modifier: Modifier = Modifier) {
     }
 }
 
+// Sección que muestra un título y una lista de tarjetas de estadísticas.
 @Composable
 fun StatsSection(stats: List<StatItem>) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(text = "El Pulso de la Seguridad Digital", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.White, modifier = Modifier.padding(top = 80.dp, bottom = 50.dp))
+        // Itera sobre la lista de estadísticas para crear cada StatsCard.
         Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(67.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             stats.forEach { stat ->
                 StatsCard(stat = stat)
@@ -41,6 +43,7 @@ fun StatsSection(stats: List<StatItem>) {
     }
 }
 
+// Composable principal para la pantalla de inicio (para usuarios no logueados).
 @Composable
 fun HomeScreen(stats: List<StatItem>, navController: NavController, learnItems: List<LearnItem>) {
 
@@ -48,10 +51,11 @@ fun HomeScreen(stats: List<StatItem>, navController: NavController, learnItems: 
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 27.dp)
-            .verticalScroll(rememberScrollState()),
+            .verticalScroll(rememberScrollState()), // Permite que la pantalla sea scrollable.
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(32.dp))
+        // --- Sección de Branding (Logo y Eslogan) ---
         Image(
             painter = painterResource(id = R.drawable.securelink_logo),
             contentDescription = "Logo",
@@ -72,7 +76,8 @@ fun HomeScreen(stats: List<StatItem>, navController: NavController, learnItems: 
             modifier = Modifier.padding(top = 16.dp)
         )
 
-        // Botón para Registrarse
+        // --- Sección de Navegación ---
+        // Botón para navegar a la pantalla de registro.
         Button(
             onClick = { navController.navigate("RegistroScreen") },
             modifier = Modifier
@@ -83,7 +88,7 @@ fun HomeScreen(stats: List<StatItem>, navController: NavController, learnItems: 
             Text(text = "Crea tu Cuenta Gratis", color = Color.Black)
         }
 
-        // Botón para Iniciar Sesión
+        // Botón para navegar a la pantalla de inicio de sesión.
         Button(
             onClick = { navController.navigate("Login") },
             modifier = Modifier
@@ -94,10 +99,9 @@ fun HomeScreen(stats: List<StatItem>, navController: NavController, learnItems: 
             Text(text = "Inicia sesion", color = Color.Black);
         }
 
-        // Sección de Estadísticas
+        // --- Sección de Contenido ---
         StatsSection(stats = stats)
 
         Spacer(modifier = Modifier.height(32.dp))
     }
 }
-

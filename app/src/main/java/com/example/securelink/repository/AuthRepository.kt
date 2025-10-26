@@ -6,105 +6,105 @@ import com.example.securelink.model.Data.Usuario
 import com.example.securelink.model.Data.UsuarioDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
 
-/**
- * AuthRepository centraliza el acceso a datos para la autenticación.
- * Es la ÚNICA fuente de verdad para los ViewModels.
- * Recibe el DAO y el SessionManager como dependencias.
- */
+// Repositorio que centraliza la lógica de autenticación y el acceso a datos.
+// Actúa como única fuente de verdad para los ViewModels.
 class AuthRepository(
     private val usuarioDao: UsuarioDao,
     private val sessionManager: SessionManager
 ) {
 
-    /**
-     * Intenta registrar un nuevo usuario.
-     * Devuelve el Usuario si tiene éxito o null si el correo ya existe.
-     * Lanza una excepción si hay un error de BD.
-     */
-
+    // Expone el usuario logueado actualmente como un Flow.
+    // Reacciona a los cambios en el ID de sesión y obtiene los datos del usuario desde el DAO.
     val usuarioActual: Flow<Usuario?> = sessionManager.idUsuarioFlow.flatMapLatest { id ->
-        if (id == null) {
-            kotlinx.coroutines.flow.flowOf(null)
+        if (id == null || id == -1) {
+            flowOf(null) // Si no hay sesión, emite null.
         } else {
-            kotlinx.coroutines.flow.flow {
-                emit(usuarioDao.getUsuarioPorId(id))
-            }
+            usuarioDao.getUsuarioPorId(id) // Si hay sesión, observa al usuario en la BD.
         }
     }
 
+    // Registra un nuevo usuario en la base de datos.
     suspend fun registrarUsuario(
         nombre: String,
         correo: String,
         contrasena: String
     ): Usuario? {
-        return withContext(Dispatchers.IO) {
-            // 1. Comprobar si el correo ya existe
-            val usuarioExistente = usuarioDao.getUsuarioPorCorreo(correo)
-            if (usuarioExistente != null) {
-                Log.w("AuthRepository", "Registro falló: Correo en uso.")
-                return@withContext null // Devuelve null si el correo ya está en uso
+        return withContext(Dispatchers.IO) { // Ejecuta en un hilo de fondo.
+            // Primero, comprueba si el correo ya está en uso para evitar duplicados.
+            if (usuarioDao.getUsuarioPorCorreo(correo) != null) {
+                return@withContext null
             }
 
-            // 2. Crear y guardar el nuevo usuario
+            // Si no existe, crea el nuevo usuario, lo inserta e inicia su sesión.
             val nuevoUsuario = Usuario(
                 nombreUsuario = nombre,
                 correoElectronico = correo,
-                contrasena = contrasena, // ¡Recuerda hashear esto en producción!
+                contrasena = contrasena,
                 fechaRegistro = LocalDate.now()
             )
             usuarioDao.insertarUsuario(nuevoUsuario)
-            Log.d("AuthRepository", "Usuario registrado exitosamente.")
 
-            // 3. Obtener el usuario guardado (con su ID) y guardar la sesión
             val usuarioGuardado = usuarioDao.getUsuarioPorCorreo(correo)
             usuarioGuardado?.let {
                 sessionManager.guardarIdUsuario(it.id)
             }
-
-            return@withContext usuarioGuardado
+            usuarioGuardado
         }
     }
 
-    /**
-     * Intenta iniciar sesión.
-     * Devuelve el Usuario si tiene éxito, o null si las credenciales son incorrectas.
-     */
+    // Valida las credenciales de un usuario para iniciar sesión.
     suspend fun iniciarSesion(correo: String, contrasena: String): Usuario? {
         return withContext(Dispatchers.IO) {
             val usuario = usuarioDao.getUsuarioPorCorreo(correo)
 
-            if (usuario == null) {
-                Log.w("AuthRepository", "Login falló: Usuario no encontrado.")
-                return@withContext null // Usuario no existe
+            // Si el usuario no existe o la contraseña no coincide, devuelve null.
+            if (usuario == null || usuario.contrasena != contrasena) {
+                return@withContext null
             }
 
-            if (usuario.contrasena != contrasena) {
-                // ¡RECUERDA! Esto es inseguro. Deberías comparar hashes.
-                Log.w("AuthRepository", "Login falló: Contraseña incorrecta.")
-                return@withContext null // Contraseña incorrecta
-            }
-
-            // ¡Éxito! Guardar sesión y devolver usuario
+            // Si las credenciales son correctas, guarda el ID en el SessionManager.
             sessionManager.guardarIdUsuario(usuario.id)
-            Log.d("AuthRepository", "Login exitoso.")
-            return@withContext usuario
+            usuario
         }
     }
 
+    // Cierra la sesión del usuario actual.
     suspend fun cerrarSesion() {
         withContext(Dispatchers.IO) {
-            sessionManager.guardarIdUsuario(-1)
-            Log.d("AuthRepository", "Sesión cerrada.")
+            sessionManager.guardarIdUsuario(-1) // Invalida el ID de sesión.
         }
     }
 
-    /**
-     * (Futuro) Comprueba si un correo existe para la recuperación.
-     */
+    // Actualiza el nombre del usuario logueado.
+    suspend fun updateUsername(newName: String) {
+        withContext(Dispatchers.IO) {
+            val userId = sessionManager.idUsuarioFlow.first() // Obtiene el ID de la sesión actual.
+            if (userId != null && userId != -1) {
+                usuarioDao.updateUsername(userId, newName)
+            }
+        }
+    }
+
+    // Elimina la cuenta del usuario actual.
+    suspend fun deleteAccount() {
+        withContext(Dispatchers.IO) {
+            val userId = sessionManager.idUsuarioFlow.first()
+            if (userId != null && userId != -1) {
+                // Importante: primero se cierra la sesión para que la UI deje de observar los datos.
+                sessionManager.guardarIdUsuario(-1)
+                // Después, se elimina el registro de la base de datos de forma segura.
+                usuarioDao.deleteUserById(userId)
+            }
+        }
+    }
+
+    // Comprueba si un correo ya está registrado en la base de datos.
     suspend fun correoExiste(correo: String): Boolean {
         return withContext(Dispatchers.IO) {
             usuarioDao.getUsuarioPorCorreo(correo) != null

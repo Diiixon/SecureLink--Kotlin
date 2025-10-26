@@ -19,7 +19,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-// --- 1. YA NO SE NECESITA LaunchedEffect ---
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,23 +36,17 @@ import com.example.securelink.ui.theme.Mint
 import com.example.securelink.ui.theme.Red
 import com.example.securelink.ui.theme.Teal
 import com.example.securelink.ui.theme.White
-// --- 2. IMPORTAR EL VIEWMODEL CORRECTO ---
 import com.example.securelink.viewmodel.RegistroViewModel
 
-
+// Composable principal para el formulario de registro de nuevos usuarios.
 @Composable
 fun Formulario(
     navController: NavController,
-    // --- 3. CAMBIAR EL TIPO DE VIEWMODEL ---
     viewModel: RegistroViewModel
 ) {
+    // Obtiene el estado de la UI desde el ViewModel y se suscribe a sus cambios.
     val estado by viewModel.estado.collectAsState()
 
-    // --- 4. ELIMINAMOS EL LaunchedEffect ---
-    // Era conflictivo con la navegación del botón.
-    // Dejamos que el botón se encargue de navegar.
-
-    // Contenedor principal
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = DarkBlue
@@ -64,7 +57,7 @@ fun Formulario(
                 .padding(16.dp),
             contentAlignment = Alignment.Center
         ) {
-            // Contenedor de la tarjeta del formulario
+            // Contenedor de la tarjeta del formulario.
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -103,17 +96,14 @@ fun Formulario(
                     unfocusedLabelColor = DarkTeal
                 )
 
-                // --- 5. CAMBIAR NOMBRES DE ESTADO (camelCase) ---
+                // --- Campos de texto del formulario ---
+                // Cada campo está vinculado al estado del ViewModel y muestra errores de validación.
                 OutlinedTextField(
-                    value = estado.nombreUsuario, // <-- CAMBIO
+                    value = estado.nombreUsuario,
                     onValueChange = viewModel::onNombreUsuarioChange,
                     label = { Text("Nombre Usuario") },
-                    isError = estado.errores.NombreUsuario != null,
-                    supportingText = {
-                        estado.errores.NombreUsuario?.let {
-                            Text(it, color = Red)
-                        }
-                    },
+                    isError = estado.errores.nombreUsuario != null,
+                    supportingText = { estado.errores.nombreUsuario?.let { Text(it, color = Red) } },
                     modifier = Modifier.fillMaxWidth(),
                     colors = textFieldColors,
                     shape = RoundedCornerShape(8.dp)
@@ -121,15 +111,11 @@ fun Formulario(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 OutlinedTextField(
-                    value = estado.correoElectronico, // <-- CAMBIO
+                    value = estado.correoElectronico,
                     onValueChange = viewModel::onCorreoElectronicoChange,
                     label = { Text("Correo Electrónico") },
-                    isError = estado.errores.CorreoElectronico != null,
-                    supportingText = {
-                        estado.errores.CorreoElectronico?.let {
-                            Text(it, color = Red)
-                        }
-                    },
+                    isError = estado.errores.correoElectronico != null,
+                    supportingText = { estado.errores.correoElectronico?.let { Text(it, color = Red) } },
                     modifier = Modifier.fillMaxWidth(),
                     colors = textFieldColors,
                     shape = RoundedCornerShape(8.dp)
@@ -137,16 +123,12 @@ fun Formulario(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 OutlinedTextField(
-                    value = estado.contrasena, // <-- CAMBIO
+                    value = estado.contrasena,
                     onValueChange = viewModel::onContrasenaChange,
                     label = { Text("Contraseña") },
                     visualTransformation = PasswordVisualTransformation(),
-                    isError = estado.errores.Contrasena != null,
-                    supportingText = {
-                        estado.errores.Contrasena?.let {
-                            Text(it, color = Red)
-                        }
-                    },
+                    isError = estado.errores.contrasena != null,
+                    supportingText = { estado.errores.contrasena?.let { Text(it, color = Red) } },
                     modifier = Modifier.fillMaxWidth(),
                     colors = textFieldColors,
                     shape = RoundedCornerShape(8.dp)
@@ -154,16 +136,12 @@ fun Formulario(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 OutlinedTextField(
-                    value = estado.contrasenaConfirmada, // <-- CAMBIO
+                    value = estado.contrasenaConfirmada,
                     onValueChange = viewModel::onContrasenaConfirmadaChange,
                     label = { Text("Confirmar Contraseña") },
                     visualTransformation = PasswordVisualTransformation(),
-                    isError = estado.errores.ContrasenaConfirmada != null,
-                    supportingText = {
-                        estado.errores.ContrasenaConfirmada?.let {
-                            Text(it, color = Red)
-                        }
-                    },
+                    isError = estado.errores.contrasenaConfirmada != null,
+                    supportingText = { estado.errores.contrasenaConfirmada?.let { Text(it, color = Red) } },
                     modifier = Modifier.fillMaxWidth(),
                     colors = textFieldColors,
                     shape = RoundedCornerShape(8.dp)
@@ -171,42 +149,29 @@ fun Formulario(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // La lógica del botón ya era correcta.
+                // Botón que llama a la función de registro en el ViewModel.
+                // La navegación solo ocurre si el registro es exitoso, a través del callback.
                 Button(
                     onClick = {
                         viewModel.registrarUsuario(
-                            onRegistroExitoso = {
-                                // Navega a Login cuando el VM confirma el éxito
-                                navController.navigate("Login")
-                            }
+                            onRegistroExitoso = { navController.navigate("Login") }
                         )
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
+                    modifier = Modifier.fillMaxWidth().height(50.dp),
                     shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Gold,
-                        contentColor = DarkBlue
-                    )
+                    colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = DarkBlue)
                 ) {
                     Text("Registrar", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
 
+                // Botón para volver a la pantalla anterior en el stack de navegación.
                 Button(
-                    onClick = {
-                        navController.popBackStack()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier.fillMaxWidth().height(50.dp),
                     shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Teal,
-                        contentColor = White
-                    )
+                    colors = ButtonDefaults.buttonColors(containerColor = Teal, contentColor = White)
                 ) {
                     Text("Volver", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                 }

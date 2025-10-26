@@ -18,7 +18,7 @@ import com.example.securelink.ui.theme.SecureLinkTheme
 import com.example.securelink.view.Formulario
 import com.example.securelink.view.HomeScreen
 import com.example.securelink.view.LoginScreen
-import com.example.securelink.view.MainAppScreen // <-- ASEGÚRATE DE IMPORTAR ESTO
+import com.example.securelink.view.MainAppScreen
 import com.example.securelink.view.RecuperarScreen
 import com.example.securelink.viewmodel.AnalyzerViewModel
 import com.example.securelink.viewmodel.HomeViewModel
@@ -27,14 +27,16 @@ import com.example.securelink.viewmodel.MainViewModel
 import com.example.securelink.viewmodel.RecuperarViewModel
 import com.example.securelink.viewmodel.RegistroViewModel
 
-
+// Activity principal y punto de entrada de la aplicación.
 class MainActivity : ComponentActivity() {
 
-    // Instanciamos los ViewModels que deben "sobrevivir" a la navegación
+    // Instancia ViewModels a nivel de Activity para que sus datos sobrevivan a los cambios de pantalla.
+    // Esto es útil para datos que se comparten o persisten entre diferentes secciones de la navegación.
     private val homeViewModel: HomeViewModel by viewModels()
     private val analyzerViewModel: AnalyzerViewModel by viewModels()
-    private val mainViewModel: MainViewModel by viewModels() // <-- ViewModel para cerrar sesión
+    private val mainViewModel: MainViewModel by viewModels()
 
+    // Punto de entrada de la Activity. Aquí se configura la UI con Jetpack Compose.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -45,15 +47,15 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val navController = rememberNavController()
 
-                    // Este es el NavHost PRINCIPAL (Gestor de Autenticación)
+                    // Configura el NavHost principal, responsable de la navegación de alto nivel
+                    // (autenticación vs. app principal).
                     NavHost(navController = navController, startDestination = "home") {
 
                         // --- RUTAS DE AUTENTICACIÓN ---
-
+                        // Ruta de la pantalla de inicio para usuarios no logueados.
                         composable("home") {
                             val stats by homeViewModel.stats.collectAsStateWithLifecycle()
                             val learnItems by homeViewModel.learnItems.collectAsStateWithLifecycle()
-
                             HomeScreen(
                                 navController = navController,
                                 stats = stats,
@@ -61,32 +63,24 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
+                        // Ruta para la pantalla de registro.
                         composable("RegistroScreen") {
-                            val registroViewModel: RegistroViewModel = viewModel()
-                            Formulario(
-                                navController = navController,
-                                viewModel = registroViewModel
-                            )
+                            Formulario(navController = navController, viewModel = viewModel<RegistroViewModel>())
                         }
 
+                        // Ruta para la pantalla de inicio de sesión.
                         composable("Login") {
-                            val loginViewModel: LoginViewModel = viewModel()
-                            LoginScreen(
-                                navController = navController,
-                                viewModel = loginViewModel
-                            )
+                            LoginScreen(navController = navController, viewModel = viewModel<LoginViewModel>())
                         }
 
+                        // Ruta para la pantalla de recuperación de contraseña.
                         composable("RecuperarScreen") {
-                            val recuperarViewModel: RecuperarViewModel = viewModel()
-                            RecuperarScreen(
-                                navController = navController,
-                                viewModel = recuperarViewModel
-                            )
+                            RecuperarScreen(navController = navController, viewModel = viewModel<RecuperarViewModel>())
                         }
 
                         // --- RUTA DE LA APP PRINCIPAL (POST-LOGIN) ---
-                        // ¡AÑADIMOS EL BLOQUE QUE FALTABA!
+                        // Ruta que carga la aplicación principal una vez que el usuario ha iniciado sesión.
+                        // Se le pasan los ViewModels de nivel de Activity.
                         composable("MainApp") {
                             MainAppScreen(
                                 analyzerViewModel = analyzerViewModel,

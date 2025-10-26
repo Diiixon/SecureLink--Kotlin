@@ -21,7 +21,6 @@ class RecuperarViewModel(application: Application) : AndroidViewModel(applicatio
     private val authRepository: AuthRepository
 
     init {
-        // Aunque no lo usemos mucho aquí, es bueno tenerlo listo
         val usuarioDao = AppDatabase.getDatabase(application).usuarioDao()
         val sessionManager = SessionManager(application)
         authRepository = AuthRepository(usuarioDao, sessionManager)
@@ -31,7 +30,8 @@ class RecuperarViewModel(application: Application) : AndroidViewModel(applicatio
         _estado.update { it.copy(correoElectronico = valor, error = null) }
     }
 
-    fun solicitarRecuperacion(onEnlaceEnviado: () -> Unit) {
+    // Renombrada para coincidir con la llamada desde la pantalla.
+    fun enviarCorreoRecuperacion() {
         val correo = _estado.value.correoElectronico
         if (correo.isBlank() || !correo.contains("@")) {
             _estado.update { it.copy(error = "Ingrese un correo válido") }
@@ -40,17 +40,11 @@ class RecuperarViewModel(application: Application) : AndroidViewModel(applicatio
 
         // Lógica de recuperación
         viewModelScope.launch {
-            // TODO: Aquí deberías usar el authRepository para
-            // comprobar si el correo existe ANTES de enviar el enlace.
+            // En una app real, aquí se comprobaría si el correo existe antes de continuar.
             // val existe = authRepository.correoExiste(correo)
-            // if (existe) { ... }
 
+            // Actualiza el estado para que la UI muestre el mensaje de éxito.
             _estado.update { it.copy(enlaceEnviado = true) }
-            onEnlaceEnviado()
         }
-    }
-
-    fun onModalDismissed() {
-        _estado.update { it.copy(enlaceEnviado = false, correoElectronico = "", error = null) }
     }
 }
