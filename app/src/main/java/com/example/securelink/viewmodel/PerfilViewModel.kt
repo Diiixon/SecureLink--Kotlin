@@ -40,14 +40,7 @@ class PerfilViewModel(context: Context) : ViewModel() {
                     _historialAnalisis.value = reportes
                     Log.d("PerfilViewModel", "Historial cargado: ${reportes.size} reportes")
                     
-                    // Log detallado de cada reporte para debugging
-                    reportes.forEachIndexed { index, reporte ->
-                        Log.d("PerfilViewModel", "Reporte $index: url=${reporte.url}")
-                        Log.d("PerfilViewModel", "  peligro='${reporte.peligro}' (length=${reporte.peligro?.length})")
-                        Log.d("PerfilViewModel", "  tipoAmenaza='${reporte.tipoAmenaza}' (length=${reporte.tipoAmenaza?.length})")
-                        Log.d("PerfilViewModel", "  imitaA='${reporte.imitaA}' (length=${reporte.imitaA?.length})")
-                        Log.d("PerfilViewModel", "  imitaA bytes: ${reporte.imitaA?.toByteArray()?.joinToString()}")
-                    }
+
                 }.onFailure { e ->
                     Log.e("PerfilViewModel", "Error al cargar historial: ${e.message}", e)
                 }

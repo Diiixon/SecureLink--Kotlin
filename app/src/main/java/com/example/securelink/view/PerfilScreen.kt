@@ -24,8 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.securelink.model.Report
 import com.example.securelink.viewmodel.PerfilViewModel
-import java.text.SimpleDateFormat
-import java.util.*
 
 @Composable
 fun PerfilScreen(
@@ -349,18 +347,10 @@ fun ReporteCard(
                 
                 // Mostrar "Imita a:" si existe y no es N/A
                 val imitaTexto = reporte.imitaA?.trim()
-                
-                // Log para debugging
-                android.util.Log.d("ReporteCard", "URL: ${reporte.url}")
-                android.util.Log.d("ReporteCard", "imitaA original: '${reporte.imitaA}'")
-                android.util.Log.d("ReporteCard", "imitaA trim: '$imitaTexto'")
-                
                 val esValorInvalido = imitaTexto.isNullOrBlank() || 
                     imitaTexto.equals("null", ignoreCase = true) ||
                     imitaTexto.equals("N/A", ignoreCase = true) ||
                     imitaTexto.equals("Sitio Desconocido", ignoreCase = true)
-                
-                android.util.Log.d("ReporteCard", "esValorInvalido: $esValorInvalido")
                 
                 if (!esValorInvalido) {
                     Text(
@@ -406,26 +396,6 @@ fun ReporteCard(
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                 )
             }
-        }
-    }
-}
-
-private fun formatearFecha(fecha: String?): String {
-    return try {
-        val parser = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'", Locale.getDefault())
-        parser.timeZone = TimeZone.getTimeZone("UTC")
-        val formatter = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
-        val date = parser.parse(fecha ?: "")
-        formatter.format(date ?: Date())
-    } catch (e: Exception) {
-        try {
-            val parser2 = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
-            parser2.timeZone = TimeZone.getTimeZone("UTC")
-            val formatter = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
-            val date = parser2.parse(fecha ?: "")
-            formatter.format(date ?: Date())
-        } catch (e2: Exception) {
-            fecha ?: "Fecha desconocida"
         }
     }
 }
