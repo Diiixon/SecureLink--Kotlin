@@ -1,59 +1,73 @@
 package com.example.securelink.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.delay
+import com.example.securelink.model.AnalisisResultado
+import com.example.securelink.network.RetrofitClient
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-// Modelo de datos que representa el estado de la pantalla del Analizador.
-data class AnalyzerUiState(
-    val textToAnalyze: String = "",       // El texto que el usuario introduce en el campo.
-    val isLoading: Boolean = false,       // Se vuelve 'true' mientras se simula el análisis.
-    val analysisResult: String? = null    // Guarda el resultado ("seguros", "sospechosos", etc.).
-)
+sealed class AnalisisEstado {
+    object Inicial : AnalisisEstado()
+    object Analizando : AnalisisEstado()
+    data class Resultado(val resultados: List<AnalisisResultado>) : AnalisisEstado()
+    data class Error(val mensaje: String) : AnalisisEstado()
+}
 
-// ViewModel para la pantalla del Analizador.
 class AnalyzerViewModel : ViewModel() {
-    // StateFlow privado para gestionar el estado internamente.
-    private val _uiState = MutableStateFlow(AnalyzerUiState())
-    // StateFlow público y de solo lectura que la UI observará.
-    val uiState = _uiState.asStateFlow()
 
-    // Actualiza el estado con el nuevo texto del campo de entrada.
-    fun onTextChanged(newText: String) {
-        _uiState.update { it.copy(textToAnalyze = newText) }
-    }
+    private val _estado = MutableStateFlow<AnalisisEstado>(AnalisisEstado.Inicial)
+    val estado: StateFlow<AnalisisEstado> = _estado
 
-    // Inicia la simulación del análisis del enlace.
-    fun onAnalyzeClicked() {
-        if (_uiState.value.textToAnalyze.isBlank()) return
+    private val apiService = RetrofitClient.apiService
+
+    fun analizarUrl(url: String, token: String) {
+        if (url.isBlank()) {
+            _estado.value = AnalisisEstado.Error("Por favor, ingresa una URL válida")
+            return
+        }
 
         viewModelScope.launch {
-            // Pone la UI en estado de carga y limpia resultados anteriores.
-            _uiState.update { it.copy(isLoading = true, analysisResult = null) }
+            _estado.value = AnalisisEstado.Analizando
+            Log.d("AnalisisViewModel", "Iniciando análisis de URL: $url")
 
-            // Simula una llamada a una API o un proceso de análisis con un retraso.
-            delay(2000)
+            try {
+                // El backend espera "textoAnalizar", no "url"
+                val requestBody = mapOf("textoAnalizar" to url)
+                Log.d("AnalisisViewModel", "Enviando petición con token: $token")
 
-            // Simula la obtención de un resultado aleatorio.
-            val resultados = listOf("seguros", "sospechosos", "bloqueadas")
-            val randomResult = resultados.random()
+                val response = apiService.analizarUrl(
+                    token = token,
+                    request = requestBody
+                )
 
-            // Actualiza la UI con el resultado y detiene el estado de carga.
-            _uiState.update { it.copy(isLoading = false, analysisResult = randomResult, textToAnalyze = "") }
+                if (response.isSuccessful && response.body() != null) {
+                    val resultados = response.body()!!
+                    Log.d("AnalisisViewModel", "Análisis exitoso: ${resultados.size} resultados")
+                    if (resultados.isNotEmpty()) {
+                        _estado.value = AnalisisEstado.Resultado(resultados)
+                    } else {
+                        _estado.value = AnalisisEstado.Error("No se encontraron URLs en el texto")
+                    }
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    Log.e("AnalisisViewModel", "Error ${response.code()}: $errorBody")
+                    _estado.value = AnalisisEstado.Error(
+                        "Error al analizar: ${response.message()}"
+                    )
+                }
+            } catch (e: Exception) {
+                Log.e("AnalisisViewModel", "Excepción: ${e.message}", e)
+                _estado.value = AnalisisEstado.Error(
+                    "Error de conexión: ${e.message ?: "No se pudo conectar"}"
+                )
+            }
         }
     }
 
-    // Resetea el estado para permitir un nuevo análisis.
-    fun resetAnalysis() {
-        _uiState.update {
-            it.copy(
-                isLoading = false,
-                analysisResult = null
-            )
-        }
+    fun reiniciar() {
+        _estado.value = AnalisisEstado.Inicial
     }
 }

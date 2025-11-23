@@ -4,5 +4,6 @@ package com.example.securelink.model
 data class RecuperarUiState(
     val correoElectronico: String = "",
     val error: String? = null,
-    val enlaceEnviado: Boolean = false
+    val enlaceEnviado: Boolean = false,
+    val isLoading: Boolean = false
 )

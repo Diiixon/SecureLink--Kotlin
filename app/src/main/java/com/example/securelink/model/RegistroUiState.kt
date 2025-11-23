@@ -3,11 +3,11 @@ import com.example.securelink.model.UsuarioErrores
 
 
 data class RegistroUiState(
-    val nombreUsuario: String = "",
-    val correoElectronico: String = "",
+    val nombre: String = "",
+    val correo: String = "",
     val contrasena: String = "",
-    val contrasenaConfirmada: String = "",
-
-    val errores: UsuarioErrores = UsuarioErrores(),
-    val registroExitoso: Boolean = false
+    val confirmarContrasena: String = "",
+    val error: String? = null,
+    val registroExitoso: Boolean = false,
+    val isLoading: Boolean = false
 )

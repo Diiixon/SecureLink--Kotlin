@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Permite HTTP para las IPs específicas -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">54.147.108.252</domain>
+    </domain-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">54.144.201.173</domain>
+    </domain-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">3.224.103.124</domain>
+    </domain-config>
+
+    <!-- Mantener por seguridad: denegar cleartext por defecto -->
+    <base-config cleartextTrafficPermitted="false" />
+</network-security-config>

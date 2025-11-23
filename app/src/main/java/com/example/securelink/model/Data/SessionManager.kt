@@ -1,38 +1,74 @@
 package com.example.securelink.model.Data
 
-
 import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import android.content.SharedPreferences
 
-// Crea una instancia de DataStore a nivel de aplicación para guardar las preferencias.
-// El archivo físico donde se guardarán los datos se llamará "sesion".
-private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "sesion")
-
-// Clase que gestiona la sesión del usuario (inicio y cierre) usando DataStore.
-class SessionManager(private val context: Context) {
+class SessionManager(context: Context) {
+    private val prefs: SharedPreferences =
+        context.getSharedPreferences("SecureLinkPrefs", Context.MODE_PRIVATE)
 
     companion object {
-        // Define la clave (key) para acceder al ID del usuario guardado en DataStore.
-        val USER_ID_KEY = intPreferencesKey("user_id")
+        private const val KEY_TOKEN = "auth_token"
+        private const val KEY_USER_ID = "user_id"
+        private const val KEY_USER_NAME = "user_name"
+        private const val KEY_USER_EMAIL = "user_email"
+        private const val KEY_IS_LOGGED_IN = "is_logged_in"
     }
 
-    // Guarda un ID de usuario en DataStore para mantener la sesión activa.
-    suspend fun guardarIdUsuario(id: Int) {
-        context.dataStore.edit {
-            it[USER_ID_KEY] = id
+    fun guardarSesionCompleta(idUsuario: Int, nombre: String, correo: String, token: String) {
+        prefs.edit().apply {
+            putInt(KEY_USER_ID, idUsuario)
+            putString(KEY_USER_NAME, nombre)
+            putString(KEY_USER_EMAIL, correo)
+            putString(KEY_TOKEN, token)
+            putBoolean(KEY_IS_LOGGED_IN, true)
+            apply()
         }
     }
 
-    // Expone el ID del usuario como un Flow para una observación reactiva.
-    // Emite el ID guardado o null si no hay ninguna sesión iniciada.
-    val idUsuarioFlow: Flow<Int?> = context.dataStore.data
-        .map { preferences ->
-            preferences[USER_ID_KEY]
-        }
+    fun hasActiveSession(): Boolean {
+        val token = getAuthToken()
+        val isLoggedIn = isLoggedIn()
+        return !token.isNullOrEmpty() && isLoggedIn
+    }
+
+    fun saveAuthToken(token: String) {
+        prefs.edit().putString(KEY_TOKEN, token).apply()
+    }
+
+    fun getAuthToken(): String? {
+        return prefs.getString(KEY_TOKEN, null)
+    }
+
+    fun saveUserName(name: String) {
+        prefs.edit().putString(KEY_USER_NAME, name).apply()
+    }
+
+    fun getUserName(): String? {
+        return prefs.getString(KEY_USER_NAME, null)
+    }
+
+    fun saveUserEmail(email: String) {
+        prefs.edit().putString(KEY_USER_EMAIL, email).apply()
+    }
+
+    fun getUserEmail(): String? {
+        return prefs.getString(KEY_USER_EMAIL, null)
+    }
+
+    fun getUserId(): Int {
+        return prefs.getInt(KEY_USER_ID, 0)
+    }
+
+    fun setLoggedIn(isLoggedIn: Boolean) {
+        prefs.edit().putBoolean(KEY_IS_LOGGED_IN, isLoggedIn).apply()
+    }
+
+    fun isLoggedIn(): Boolean {
+        return prefs.getBoolean(KEY_IS_LOGGED_IN, false)
+    }
+
+    fun clearSession() {
+        prefs.edit().clear().apply()
+    }
 }

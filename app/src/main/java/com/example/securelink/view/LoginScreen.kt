@@ -8,12 +8,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -41,16 +43,13 @@ import com.example.securelink.ui.theme.Teal
 import com.example.securelink.ui.theme.White
 import com.example.securelink.viewmodel.LoginViewModel
 
-// Composable principal para la pantalla de inicio de sesión.
 @Composable
 fun LoginScreen(
     navController: NavController,
     viewModel: LoginViewModel
 ) {
-    // Obtiene el estado de la UI desde el ViewModel y reacciona a sus cambios.
     val estado by viewModel.estado.collectAsState()
 
-    // Define un estilo reutilizable para los campos de texto, para mantener la consistencia.
     val textFieldColors = TextFieldDefaults.colors(
         focusedContainerColor = White,
         unfocusedContainerColor = White,
@@ -74,7 +73,6 @@ fun LoginScreen(
                 .padding(16.dp),
             contentAlignment = Alignment.Center
         ) {
-            // Contenedor principal del formulario.
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -100,7 +98,7 @@ fun LoginScreen(
                 )
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // Campo para el correo. Muestra un error si el estado lo indica.
+                // Campo de correo
                 OutlinedTextField(
                     value = estado.correoElectronico,
                     onValueChange = viewModel::onCorreoChange,
@@ -108,16 +106,12 @@ fun LoginScreen(
                     modifier = Modifier.fillMaxWidth(),
                     colors = textFieldColors,
                     shape = RoundedCornerShape(8.dp),
-                    isError = estado.error != null,
-                    supportingText = {
-                        estado.error?.let {
-                            Text(it, color = Red)
-                        }
-                    }
+                    isError = estado.mensajeError != null,
+                    enabled = !estado.cargando
                 )
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Campo para la contraseña. Usa PasswordVisualTransformation para ocultar el texto.
+                // Campo de contraseña
                 OutlinedTextField(
                     value = estado.contrasena,
                     onValueChange = viewModel::onContrasenaChange,
@@ -126,11 +120,11 @@ fun LoginScreen(
                     modifier = Modifier.fillMaxWidth(),
                     colors = textFieldColors,
                     shape = RoundedCornerShape(8.dp),
-                    isError = estado.error != null,
-                    supportingText = {}
+                    isError = estado.mensajeError != null,
+                    enabled = !estado.cargando
                 )
 
-                // Texto clicable que navega a la pantalla de recuperación de contraseña.
+                // Texto de recuperación de contraseña
                 ClickableText(
                     text = AnnotatedString("¿Olvidaste tu contraseña?"),
                     style = TextStyle(
@@ -138,21 +132,21 @@ fun LoginScreen(
                         fontWeight = FontWeight.Bold
                     ),
                     onClick = {
-                        navController.navigate("RecuperarScreen")
+                        if (!estado.cargando) {
+                            navController.navigate("RecuperarScreen")
+                        }
                     },
                     modifier = Modifier.align(Alignment.Start)
                 )
 
                 Spacer(modifier = Modifier.height(54.dp))
 
-                // Botón principal que inicia el proceso de login en el ViewModel.
+                // Botón de login con indicador de carga
                 Button(
                     onClick = {
                         viewModel.iniciarSesion(
-                            // Callback que se ejecuta solo si el login en el ViewModel es exitoso.
                             onLoginExitoso = {
                                 navController.navigate("MainApp") {
-                                    // Limpia el stack de navegación hasta 'home' para que el usuario no pueda volver atrás.
                                     popUpTo("home") { inclusive = true }
                                     launchSingleTop = true
                                 }
@@ -166,14 +160,38 @@ fun LoginScreen(
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Gold,
                         contentColor = DarkBlue
-                    )
+                    ),
+                    enabled = !estado.cargando
                 ) {
-                    Text("Ingresar", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    if (estado.cargando) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = DarkBlue,
+                            strokeWidth = 3.dp
+                        )
+                    } else {
+                        Text("Ingresar", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    }
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
-                // Texto clicable que navega a la pantalla de registro.
+                // Mensaje de error
+                estado.mensajeError?.let { mensaje ->
+                    Text(
+                        text = mensaje,
+                        color = Red,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Texto de registro
                 ClickableText(
                     text = AnnotatedString("¿No tienes una cuenta? Regístrate aqui"),
                     style = TextStyle(
@@ -182,7 +200,9 @@ fun LoginScreen(
                         fontWeight = FontWeight.Bold
                     ),
                     onClick = {
-                        navController.navigate("RegistroScreen")
+                        if (!estado.cargando) {
+                            navController.navigate("RegistroScreen")
+                        }
                     }
                 )
             }
