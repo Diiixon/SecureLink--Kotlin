@@ -7,7 +7,12 @@ import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [33], manifest = Config.NONE)
 class SessionManagerTest {
 
     private lateinit var context: Context
@@ -21,11 +26,15 @@ class SessionManagerTest {
         sharedPrefs = mockk(relaxed = true)
         editor = mockk(relaxed = true)
 
-        every { context.getSharedPreferences(any(), any()) } returns sharedPrefs
+        // CORRECCIÓN: Tipos explícitos para any<...>()
+        every { context.getSharedPreferences(any<String>(), any<Int>()) } returns sharedPrefs
         every { sharedPrefs.edit() } returns editor
-        every { editor.putString(any(), any()) } returns editor
-        every { editor.putInt(any(), any()) } returns editor
-        every { editor.putBoolean(any(), any()) } returns editor
+
+        // CORRECCIÓN: Tipos explícitos para cadenas, enteros y booleanos
+        every { editor.putString(any<String>(), any<String>()) } returns editor
+        every { editor.putInt(any<String>(), any<Int>()) } returns editor
+        every { editor.putBoolean(any<String>(), any<Boolean>()) } returns editor
+
         every { editor.apply() } just Runs
         every { editor.clear() } returns editor
 

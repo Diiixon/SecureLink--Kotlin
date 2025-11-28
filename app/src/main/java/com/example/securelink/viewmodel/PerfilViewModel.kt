@@ -12,20 +12,20 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class PerfilViewModel(context: Context) : ViewModel() {
+open class PerfilViewModel(context: Context) : ViewModel() {
     private val usuarioRepository = UsuarioRepository(context)
     private val reportesRepository = ReportesRepository(context)
 
     private val _usuario = MutableStateFlow<Usuario?>(null)
-    val usuario: StateFlow<Usuario?> = _usuario
+    open val usuario: StateFlow<Usuario?> = _usuario
 
     private val _historialAnalisis = MutableStateFlow<List<Report>>(emptyList())
-    val historialAnalisis: StateFlow<List<Report>> = _historialAnalisis
+    open val historialAnalisis: StateFlow<List<Report>> = _historialAnalisis
 
     private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
+    open val isLoading: StateFlow<Boolean> = _isLoading
 
-    fun cargarDatos() {
+    open fun cargarDatos() {
         if (_isLoading.value) return // Evita múltiples llamadas simultáneas
 
         viewModelScope.launch {

@@ -154,7 +154,7 @@ fun PerfilScreen(
                 } else {
                     item {
                         Text(
-                            text = "No hay enlaces escaneados aún",
+                            text = "No hay análisis en el historial",
                             fontSize = 16.sp,
                             color = colorTextoClaro.copy(alpha = 0.6f),
                             modifier = Modifier.padding(vertical = 32.dp)
