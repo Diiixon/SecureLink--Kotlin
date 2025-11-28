@@ -17,13 +17,14 @@ import android.util.Log
 import org.json.JSONObject
 
 
-class LoginViewModel(application: Application) : AndroidViewModel(application) {
+class LoginViewModel(
+    application: Application,
+    private val authRepository: AuthRepository = AuthRepository(),
+    private val sessionManager: SessionManager = SessionManager(application)
+) : AndroidViewModel(application) {
 
     private val _estado = MutableStateFlow(LoginUiState())
     val estado: StateFlow<LoginUiState> = _estado.asStateFlow()
-
-    private val authRepository = AuthRepository()
-    private val sessionManager = SessionManager(application)
 
     fun onCorreoChange(valor: String) {
         _estado.update { it.copy(correoElectronico = valor, error = null) }
