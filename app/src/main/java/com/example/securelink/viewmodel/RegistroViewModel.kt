@@ -1,7 +1,10 @@
 package com.example.securelink.viewmodel
 
 import android.app.Application
+import android.util.Base64
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import org.json.JSONObject
 import androidx.lifecycle.viewModelScope
 import com.example.securelink.model.Data.SessionManager
 import com.example.securelink.model.RegistroUiState
@@ -82,11 +85,23 @@ class RegistroViewModel(application: Application) : AndroidViewModel(application
             )
 
             result.onSuccess { response ->
-                // Guardar datos de sesión con el nombre correcto de la propiedad
+                Log.d("RegistroViewModel", "Registro exitoso - Token: ${response.token}, UserId: ${response.userId}, Username: ${response.username}")
+
+                // Extraer el nombre del token JWT si username es null
+                val nombre = response.username ?: try {
+                    extraerNombreDelToken(response.token)
+                } catch (e: Exception) {
+                    Log.e("RegistroViewModel", "Error al extraer nombre del token", e)
+                    estadoActual.nombre // Usar el nombre que ingresó el usuario
+                }
+
+                Log.d("RegistroViewModel", "Nombre a guardar: $nombre")
+
+                // Guardar datos de sesión usando los datos de la respuesta
                 sessionManager.guardarSesionCompleta(
-                    idUsuario = response.usuario.idUsuario.toInt(),
-                    nombre = response.usuario.nombre,
-                    correo = response.usuario.correoElectronico,  // ⭐ CAMBIO: correoElectronico en lugar de email
+                    idUsuario = if (response.userId > 0) response.userId else 1,
+                    nombre = nombre,
+                    correo = estadoActual.correo,
                     token = response.token
                 )
 
@@ -122,6 +137,19 @@ class RegistroViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+
+    private fun extraerNombreDelToken(token: String): String {
+        val parts = token.split(".")
+        if (parts.size != 3) throw IllegalArgumentException("Token JWT inválido")
+
+        val payload = String(Base64.decode(parts[1], Base64.URL_SAFE))
+        val json = JSONObject(payload)
+
+        // Intentar extraer el nombre de diferentes campos posibles
+        return json.optString("name", null)
+            ?: json.optString("username", null)
+            ?: json.optString("sub", "Usuario")
+    }
 
     fun clearError() {
         _estado.update { it.copy(error = null) }

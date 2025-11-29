@@ -12,9 +12,9 @@ data class LoginRequest(
 )
 
 data class UsuarioResponse(
-    val idUsuario: Long,
-    val nombre: String,
-    val correoElectronico: String
+    val idUsuario: Long? = null,
+    val nombre: String? = null,
+    val correoElectronico: String? = null
 )
 
 data class UsuarioDto(

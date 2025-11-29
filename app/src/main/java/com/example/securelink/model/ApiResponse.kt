@@ -11,6 +11,7 @@ data class LoginResponse(
 // Respuesta de REGISTRO
 data class RegisterResponse(
     val token: String,
-    val usuario: UsuarioResponse
+    val userId: Int,
+    val username: String?
 )
 

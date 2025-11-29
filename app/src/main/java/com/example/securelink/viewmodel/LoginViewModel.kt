@@ -2,16 +2,17 @@ package com.example.securelink.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.securelink.model.Data.SessionManager
 import com.example.securelink.model.LoginUiState
 import com.example.securelink.repository.AuthRepository
+import com.example.securelink.model.Data.SessionManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlin.text.toInt
 import android.util.Base64
 import android.util.Log
 import org.json.JSONObject
@@ -146,5 +147,19 @@ class LoginViewModel(
 
     fun clearError() {
         _estado.update { it.copy(error = null, mensajeError = null) }
+    }
+
+    companion object {
+        fun provideFactory(application: Application): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return LoginViewModel(
+                        application = application,
+                        authRepository = AuthRepository(),
+                        sessionManager = SessionManager(application)
+                    ) as T
+                }
+            }
     }
 }

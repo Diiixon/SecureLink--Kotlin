@@ -20,7 +20,7 @@ class MainActivityAdditionalTest {
         // Verifica que MainActivity se inicializa correctamente
         // La pantalla de inicio debe estar visible
         composeTestRule.waitForIdle()
-
+        
         // Verificar que algún elemento de la UI está presente
         composeTestRule.onNodeWithText("Tu primera línea de defensa...").assertExists()
     }
@@ -28,7 +28,7 @@ class MainActivityAdditionalTest {
     @Test
     fun mainActivity_showsLogo() {
         composeTestRule.waitForIdle()
-
+        
         // Verifica que el logo/branding está presente
         composeTestRule.onNodeWithText("Analizamos enlaces...").assertExists()
     }
@@ -36,7 +36,7 @@ class MainActivityAdditionalTest {
     @Test
     fun mainActivity_showsNavigationButtons() {
         composeTestRule.waitForIdle()
-
+        
         // Verifica que los botones de navegación están presentes
         composeTestRule.onNodeWithText("Crea tu Cuenta Gratis").assertExists()
         composeTestRule.onNodeWithText("Inicia sesion").assertExists()
@@ -45,7 +45,7 @@ class MainActivityAdditionalTest {
     @Test
     fun mainActivity_showsStatsSection() {
         composeTestRule.waitForIdle()
-
+        
         // Verifica que la sección de estadísticas está presente
         composeTestRule.onNodeWithText("El Pulso de la Seguridad Digital").assertExists()
     }
@@ -53,7 +53,7 @@ class MainActivityAdditionalTest {
     @Test
     fun mainActivity_hasHomeScreenContent() {
         composeTestRule.waitForIdle()
-
+        
         // Verifica múltiples elementos para asegurar que la pantalla está completamente cargada
         composeTestRule.onNodeWithText("Tu primera línea de defensa...").assertExists()
         composeTestRule.onNodeWithText("Crea tu Cuenta Gratis").assertExists()

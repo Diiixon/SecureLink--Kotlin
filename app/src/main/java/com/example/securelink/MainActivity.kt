@@ -70,10 +70,12 @@ class MainActivity : ComponentActivity() {
 
                         // Ruta para la pantalla de inicio de sesión.
                         composable("Login") {
-                            LoginScreen(navController = navController, viewModel = viewModel<LoginViewModel>())
+                            val loginViewModel: LoginViewModel = viewModel(
+                                factory = LoginViewModel.provideFactory(application)
+                            )
+                            LoginScreen(navController = navController, viewModel = loginViewModel)
                         }
 
-                        // Ruta para la pantalla de recuperación de contraseña.
                         composable("RecuperarScreen") {
                             RecuperarScreen(navController = navController, viewModel = viewModel<RecuperarViewModel>())
                         }

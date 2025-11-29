@@ -2,7 +2,6 @@ package com.example.securelink.repository
 
 import com.example.securelink.model.LoginResponse
 import com.example.securelink.model.RegisterResponse
-import com.example.securelink.model.UsuarioResponse
 import com.example.securelink.network.ApiService
 import com.example.securelink.network.RetrofitInstance
 import io.mockk.*
@@ -118,14 +117,10 @@ class AuthRepositoryTest {
 
     @Test
     fun `register exitoso debe retornar success con RegisterResponse`() = runTest {
-        val usuarioResponse = UsuarioResponse(
-            idUsuario = 1L,
-            nombre = "Juan",
-            correoElectronico = "juan@test.com"
-        )
         val registerResponse = RegisterResponse(
             token = "new_user_token",
-            usuario = usuarioResponse
+            userId = 1,
+            username = "Juan"
         )
         val response = Response.success(registerResponse)
 
@@ -213,8 +208,11 @@ class AuthRepositoryTest {
 
     @Test
     fun `register debe enviar nombre, email y password correctos`() = runTest {
-        val usuarioResponse = UsuarioResponse(2L, "Pedro López", "pedro@test.com")
-        val registerResponse = RegisterResponse("token123", usuarioResponse)
+        val registerResponse = RegisterResponse(
+            token = "token123",
+            userId = 2,
+            username = "Pedro López"
+        )
         val response = Response.success(registerResponse)
 
         coEvery {

@@ -39,6 +39,7 @@ class AuthRepository {
     ): Result<RegisterResponse> {
         return withContext(Dispatchers.IO) {
             try {
+                // android.util.Log.d("AuthRepository", "Registrando usuario: $email")
                 val response = apiService.register(
                     mapOf(
                         "username" to nombre,
@@ -47,20 +48,29 @@ class AuthRepository {
                     )
                 )
 
+                // android.util.Log.d("AuthRepository", "Response code: ${response.code()}")
+                // android.util.Log.d("AuthRepository", "Response body: ${response.body()}")
+                // android.util.Log.d("AuthRepository", "Response raw: ${response.raw()}")
+
                 if (response.isSuccessful && response.body() != null) {
-                    Result.success(response.body()!!)
+                    val body = response.body()!!
+                    // android.util.Log.d("AuthRepository", "Token: ${body.token}")
+                    // android.util.Log.d("AuthRepository", "UserId: ${body.userId}, Username: ${body.username}")
+                    Result.success(body)
                 } else {
                     val errorMsg = when (response.code()) {
                         409 -> "El correo ya está registrado"
                         400 -> "Datos inválidos"
                         else -> {
                             val errorBody = response.errorBody()?.string() ?: "Error desconocido"
+                            // android.util.Log.e("AuthRepository", "Error body: $errorBody")
                             "Error al registrar: $errorBody"
                         }
                     }
                     Result.failure(Exception(errorMsg))
                 }
             } catch (e: Exception) {
+                // android.util.Log.e("AuthRepository", "Exception en register", e)
                 Result.failure(e)
             }
         }
