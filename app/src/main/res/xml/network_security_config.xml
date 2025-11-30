@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Permite HTTP para las IPs específicas de los microservicios -->
+
+    <!-- Autenticación -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">54.147.108.252</domain>
+    </domain-config>
+
+    <!-- Análisis -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">54.144.201.173</domain>
+    </domain-config>
+
+    <!-- Estadísticas (CORRECCIÓN: Se añade la IP que faltaba) -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">98.95.213.83</domain>
+    </domain-config>
+
+    <!-- IP antigua (se mantiene por si acaso) -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">3.224.103.124</domain>
+    </domain-config>
+
+    <!-- Mantener por seguridad: denegar cleartext para cualquier otro dominio -->
+    <base-config cleartextTrafficPermitted="false" />
+</network-security-config>
