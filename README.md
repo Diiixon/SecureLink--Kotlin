@@ -8,4 +8,7 @@
 
  La aplicación está diseñada para operar con una arquitectura de microservicios en el backend
 
- Servicio de Autenticación: Gestiona el registro y login de usuarios.◦Endpoint (ejemplo): http://54.147.108.252:8080/•Servicio de Análisis: Procesa las URLs enviadas y devuelve el veredicto de seguridad.◦Endpoint (ejemplo): http://54.144.201.173:8081/•Servicio de Estadísticas: Provee datos agregados para la visualización de estadísticas personales y globales.◦Endpoint (ejemplo): http://52.22.137.158:8082/
+ Servicio de Autenticación: Gestiona el registro y login de usuarios.◦Endpoint (ejemplo): http://54.147.108.252:8080/
+ •Servicio de Análisis: Procesa las URLs enviadas y devuelve el veredicto de seguridad.◦Endpoint (ejemplo): http://54.144.201.173:8081/
+ •Servicio de Estadísticas: Provee datos agregados para la visualización de estadísticas personales y globales.◦Endpoint (ejemplo): http://52.22.137.158:8082/
+ 
